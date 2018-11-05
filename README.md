@@ -66,4 +66,18 @@ https://news.qq.com/a/20181028/008376.htm
 
 ## 3. Realize HMM-HDP & Gibbs based algorithm.
 
+
+
+## Other resources:
+
+> Dirichlet Distribution:
+https://zh.wikipedia.org/wiki/%E7%8B%84%E5%88%A9%E5%85%8B%E9%9B%B7%E5%88%86%E5%B8%83
+
+> LDA:
+https://zh.wikipedia.org/wiki/%E9%9A%90%E5%90%AB%E7%8B%84%E5%88%A9%E5%85%8B%E9%9B%B7%E5%88%86%E5%B8%83
+
+> https://zhuanlan.zhihu.com/p/31470216
+
+> https://blog.csdn.net/v_july_v/article/details/41209515
+
 ![](/tobecontinued.jpg)
