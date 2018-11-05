@@ -39,7 +39,7 @@ https://www.1point3acres.com/bbs/thread-452818-1-1.html
 ### Online news:
 https://news.qq.com/a/20181028/008376.htm
 
-> **Original:**
+> **Original:**  
 央视网消息新闻联播  
 习近平总书记在广东考察时强调  
 要高举新时代改革开放旗帜  
