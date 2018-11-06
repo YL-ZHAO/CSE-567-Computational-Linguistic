@@ -8,26 +8,30 @@ sentence segmentation.
                     Xingyu YAN
                 xingyuyan@outlook.com
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+import numpy as np
+import pickle
 
-class Mod:
+class Mod():
 
-    #-----------------------------------------------------
-    # Define model parameters.
-    # This is given based on the paper of Chen et al.
+    def __init__(self):
 
-    # For HDP:
-    __alf1 = 1000   # alpha 1
-    __alf = 10      # alpha
-    __ps = 0.5      # p#
+        #-----------------------------------------------------
+        # Define model parameters.
+        # This is given based on the paper of Chen et al.
 
-    # For HMM:
-    __the = 1       # theta
-    __sig = 0.01    # sigma
+        # For HDP:
+        self.__alf1 = 1000   # alpha 1
+        self.__alf = 10      # alpha
+        self.__ps = 0.5      # p#
 
-    #-----------------------------------------------------
-    # Define model data
-    Word = []
+        # For HMM:
+        self.__the = 1       # theta
+        self.__sig = 0.01    # sigma
 
+        #-----------------------------------------------------
+        # Define model data
+        self.Word = []
+        self.pt = np.zeros( (4,4) )
 
     #-----------------------------------------------------
     # Define methods, read dict, train model, segment
@@ -50,6 +54,10 @@ class Mod:
 
     # Train the HMM part
     def train_HMM(self):
+        # { S B M E }
+        #   0 1 2 3
+
+
         print("train_HMM fun not started...")
         print("alpha 1", self.__alf1)
         print("alpha", self.__alf)
@@ -93,14 +101,12 @@ class Mod:
     # If the model has been trained, simply save it for next time.
     def save(self,name):
 
-        import pickle
-
         f = open(name,'wb')     # write binary
         pickle.dump(self,f)
         f.close()
 
         # hint for load:
-        import pickle
-        f = open(name,'rb')
-        mod = pickle.load(f)
-        f.close()
+        # import pickle
+        # f = open(name,'rb')
+        # mod = pickle.load(f)
+        # f.close()
