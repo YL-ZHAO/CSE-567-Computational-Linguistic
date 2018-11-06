@@ -1,10 +1,13 @@
-#---------------------------------------------------------
-# Define the class Sentence Segmentation Module/Model
-#   Its instance will save the trained data, and conduct
-#   sentence segmentation.
-#
-#--------------------Xingyu YAN---------------------------
-#----------------xingyuyan@outlook.com--------------------
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    Class Mod
+
+Define the class Sentence Segmentation Module/Model.
+Its instance will save the trained data, and conduct
+sentence segmentation.
+
+                    Xingyu YAN
+                xingyuyan@outlook.com
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 class Mod:
 
@@ -23,9 +26,7 @@ class Mod:
 
     #-----------------------------------------------------
     # Define model data
-
-
-
+    Dic = []
 
 
     #-----------------------------------------------------
@@ -33,8 +34,15 @@ class Mod:
     #-----------------------------------------------------
     # Training Stage
     # Read dictionary data
-    def readDic(self):
-        print("readDic fun not started...")
+    # Dictionary data should be preprocessed, so that each
+    # line is a chinese word.
+    def readDic(self,name):
+
+        f = open(name)
+        self.Dic = f.readlines()
+        f.close()
+        for i in range(len(self.Dic)):
+            self.Dic[i] = self.Dic[i].strip('\n')
 
     # Train the model
     def train(self):
@@ -68,7 +76,10 @@ class Mod:
 
     # Print dictionary info
     def infoDic(self):
-        print("infoDic fun not started...")
+        print('----------------------------------------')
+        print('Dictionary info:')
+        print('\t # of words: \t', len(self.Dic))
+        print('----------------------------------------')
 
     # Print training info
     def infoTrain(self):
