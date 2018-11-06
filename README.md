@@ -67,10 +67,10 @@ https://news.qq.com/a/20181028/008376.htm
 ## 3. Realize HMM-HDP & Gibbs based algorithm.
 
 ### 3.1. Read Dictionary Data:
-> from SentSeg import Mod
-M = Mod()
-M.readDic('zh-wiki-dic.txt')
-M.infoDic()
+> from SentSeg import Mod  
+M = Mod()  
+M.readDic('zh-wiki-dic.txt')  
+M.infoDic()  
 
 ### 3.2. Train Bayesian HMM:
 
