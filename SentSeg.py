@@ -29,9 +29,19 @@ class Mod():
         self.__sig = 0.01    # sigma
 
         #-----------------------------------------------------
-        # Define model data
+        # Define model data, including training dictionary and
+        #   training results.
+        
+        # Training dictionary
         self.Word = []
-        self.pt = np.zeros( (4,4) )
+        self.Char = []
+
+        # HMM training results
+        self.Pt = np.zeros( (4,4) )
+        self.Pe = np.zeros( (4,len(self.Char)) )
+
+        # HDP training results
+
 
     #-----------------------------------------------------
     # Define methods, read dict, train model, segment
@@ -44,9 +54,15 @@ class Mod():
 
         f = open(name)
         self.Word = f.readlines()
+        f.seek(0)
+        self.Char = f.read()
         f.close()
+        
         for i in range(len(self.Word)):
             self.Word[i] = self.Word[i].strip('\n')
+        
+        self.Char = self.Char.replace('\n','')
+        self.Char = list(set(self.Char))
 
     # Train the model
     def train(self):
@@ -89,6 +105,13 @@ class Mod():
         print('\t # of words: \t', len(self.Word))
         print('----------------------------------------')
 
+    # Print characteristic info
+    def infoChar(self):
+        print('----------------------------------------')
+        print('Char info:')
+        print('\t # of Chars: \t', len(self.Char))
+        print('----------------------------------------')
+    
     # Print training info
     def infoTrain(self):
         print("infoTrain fun not started...")

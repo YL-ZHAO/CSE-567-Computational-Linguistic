@@ -7,8 +7,10 @@ print(M.Word[0])
 
 print(M.Word[-1])
 
-print(M.pt)
+print(M.Pt)
 
 M.infoWord()
+
+M.infoChar()
 
 M.save('M')
