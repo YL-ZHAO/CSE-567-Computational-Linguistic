@@ -26,23 +26,23 @@ class Mod:
 
     #-----------------------------------------------------
     # Define model data
-    Dic = []
+    Word = []
 
 
     #-----------------------------------------------------
     # Define methods, read dict, train model, segment
     #-----------------------------------------------------
     # Training Stage
-    # Read dictionary data
-    # Dictionary data should be preprocessed, so that each
+    # Read word data
+    # Word data should be preprocessed, so that each
     # line is a chinese word.
-    def readDic(self,name):
+    def readWord(self,name):
 
         f = open(name)
-        self.Dic = f.readlines()
+        self.Word = f.readlines()
         f.close()
-        for i in range(len(self.Dic)):
-            self.Dic[i] = self.Dic[i].strip('\n')
+        for i in range(len(self.Word)):
+            self.Word[i] = self.Word[i].strip('\n')
 
     # Train the model
     def train(self):
@@ -74,11 +74,11 @@ class Mod:
     #-----------------------------------------------------
     # Additional Methods
 
-    # Print dictionary info
-    def infoDic(self):
+    # Print word info
+    def infoWord(self):
         print('----------------------------------------')
-        print('Dictionary info:')
-        print('\t # of words: \t', len(self.Dic))
+        print('Word info:')
+        print('\t # of words: \t', len(self.Word))
         print('----------------------------------------')
 
     # Print training info
