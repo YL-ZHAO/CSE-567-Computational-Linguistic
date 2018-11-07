@@ -1,13 +1,11 @@
-from SentSeg import Mod
+from SenSeg import Mod
 
 M = Mod()
 M.readWord('zh-wiki-dic.txt')
 
-print(M.Word[0])
+M.trainHMM()
 
-print(M.Word[-1])
-
-print(M.Pt)
+M.infoTrain()
 
 M.infoWord()
 
