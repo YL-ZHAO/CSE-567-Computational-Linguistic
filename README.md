@@ -66,19 +66,39 @@ https://news.qq.com/a/20181028/008376.htm
 
 ## 3. Realize HMM-HDP & Gibbs based algorithm.
 
-### 3.1. Read Dictionary Data:
-> from SentSeg import Mod  
+### 3.1. Create Instance:
+
+Import package, create instance:  
+>
+from SenSeg import Mod  
 M = Mod()  
-M.readWord('zh-wiki-dic.txt')  
-M.infoWord()  
+
+You can save the instance at anytime for later use:  
+>
 M.save('M')  
 
-### 3.2. Train Bayesian HMM:
+### 3.2. Read Dictionary Data:
 
-### 3.3. Train HDP:
+If the data is the index from wiki directly:  
+>
+\# name1 is the wiki file name  
+\# name2 is the output dictionary file name  
+M.readWiki(name1, name2)  
 
-### 
+If the data has been processed, read it directly:  
+>
+M.readWord('zh-wiki-dic.txt')  
 
+### 3.3. Train Model
+
+The method will train the model in HMM and HDP:  
+>
+M.trainMod()
+
+It calls two methods:  
+>
+M.trainHMM()  
+M.trainHDP()  
 
 
 ## Other resources:
