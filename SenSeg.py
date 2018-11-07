@@ -41,18 +41,20 @@ class Mod:
 
         # HMM training results
         self.Pt = np.zeros( (4,4) )     # {SBME}
-        self.Pe = np.zeros( (4,len(self.Char)) )
+        self.Pe = np.zeros( (len(self.Char),4) )
 
         # HDP training results
 
 
     #-----------------------------------------------------
-    # Define methods, read dict, train model, segment
+    # Core Methods
     #-----------------------------------------------------
-    # Training Stage
+    
     # Read word data
-    # Word data should be preprocessed, so that each
-    # line is a chinese word.
+    '''
+    Word data should be preprocessed, so that each
+        line is a chinese word.
+    '''
     def readWord(self,name):
 
         f = open(name)
@@ -67,14 +69,20 @@ class Mod:
         self.Char = self.Char.replace('\n','')
         self.Char = list(set(self.Char))    # set(), non-sequenced, no overlaping
         self.__V = len(self.Char)
+        self.Pe = np.zeros( (len(self.Char),4) )
 
-    # If the dictionary is from wiki, no preprocessing,
-    #   then use this function to preprocess and read
+
+    # Read raw wiki data
+    '''
+    If the dictionary is from wiki, no preprocessing,
+        then use this function to preprocess and read
+    '''
     def readWiki(self,name1,name2):
-        # name1 : name of input file
-        # name2 : name of output file
-        #   output it so no need to process next time
-
+        '''
+        name1 : name of input file
+        name2 : name of output file
+            output it so no need to process next time
+        '''
         # read data
         f = open(name1)
         st = f.read()
@@ -107,11 +115,16 @@ class Mod:
     
     # Train the HMM part
     def trainHMM(self):
-        # { S B M E }
-        #   0 1 2 3
+        
+        # Tags
+        '''
+        { S B M E }
+          0 1 2 3
+        '''
 
         #-----------------------------------------------------
         # Train Transition Probability
+        #-----------------------------------------------------
         '''
         since we use the dictionary from wiki, not the corpus as the article,
         our word has no context relation with front and back
@@ -120,11 +133,14 @@ class Mod:
         same assumptions are also applied for other calculation
         '''
         count_s = 0
+        count_b = 0
+        count_m = 0
+        count_e = 0
+        
         count_bm = 0
         count_be = 0
         count_mm = 0
         count_me = 0
-        count_e = 0
 
         for w in self.Word:
             
@@ -137,6 +153,8 @@ class Mod:
                 count_me = count_me + 1
                 count_mm = count_mm + (len(w)-3)
         
+        count_b = count_bm + count_be
+        count_m = count_bm + count_mm
         count_e = count_be + count_me
         
         # S->S
@@ -161,10 +179,35 @@ class Mod:
 
         #-----------------------------------------------------
         # Train Emission Probability
-
-
-        
-
+        #-----------------------------------------------------
+        '''
+        row number corresponding to self.Char
+        '''
+        ic = 0      # index for char
+        for c in self.Char:
+            nt0 = 0
+            nt1 = 0
+            nt2 = 0
+            nt3 = 0
+            for w in self.Word:
+                l = len(w)
+                for i in range(l):
+                    if c == w[i]:
+                        if l == 1:
+                            nt0 = nt0 + 1
+                        elif i == 0:
+                            nt1 = nt1 + 1
+                        elif i == l-1:
+                            nt3 = nt3 + 1
+                        else:
+                            nt2 = nt2 + 1
+            
+            self.Pe[ic,0] = (nt0 + self.__sig) / (count_s + self.__V*self.__sig)
+            self.Pe[ic,1] = (nt1 + self.__sig) / (count_b + self.__V*self.__sig)
+            self.Pe[ic,2] = (nt2 + self.__sig) / (count_m + self.__V*self.__sig)
+            self.Pe[ic,3] = (nt3 + self.__sig) / (count_e + self.__V*self.__sig)
+            ic = ic +1
+    
 
     # Train the HDP part
     def trainHDP(self):
@@ -184,6 +227,7 @@ class Mod:
 
     #-----------------------------------------------------
     # Additional Methods
+    #-----------------------------------------------------
 
     # Print word info
     def infoWord(self):
@@ -201,6 +245,9 @@ class Mod:
     
     # Print training info
     def infoTrain(self):
+        print('----------------------------------------')
+        print("HMM-Pe:")
+        print(self.Pe)
         print('----------------------------------------')
         print("HMM-Pt:")
         print(self.Pt)
