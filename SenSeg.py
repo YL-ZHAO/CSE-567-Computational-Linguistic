@@ -141,9 +141,11 @@ class Mod:
 
         # train HMM Pe
         pool = Pool()
-        self = pool.map(self.trainHMMPe,range(10))  #len(self.Char)
-        # pool.close()
-        # pool.join()
+        results = pool.map(self.trainHMMPe,range(len(self.Char)))
+        pool.close()
+        pool.join()
+        results = np.array(results)
+        self.Pe = results
 
 
     # Train HMM Pt
@@ -205,6 +207,7 @@ class Mod:
         '''
         print(idx)
         c = self.Char[idx]
+        Pe = [None]*4
         nt0 = 0
         nt1 = 0
         nt2 = 0
@@ -222,11 +225,11 @@ class Mod:
                     else:
                         nt2 = nt2 + 1
         
-        self.Pe[idx,0] = (nt0 + self.__sig) / (self.count_s + self.__V*self.__sig)
-        self.Pe[idx,1] = (nt1 + self.__sig) / (self.count_b + self.__V*self.__sig)
-        self.Pe[idx,2] = (nt2 + self.__sig) / (self.count_m + self.__V*self.__sig)
-        self.Pe[idx,3] = (nt3 + self.__sig) / (self.count_e + self.__V*self.__sig)
-
+        Pe[0] = (nt0 + self.__sig) / (self.count_s + self.__V*self.__sig)
+        Pe[1] = (nt1 + self.__sig) / (self.count_b + self.__V*self.__sig)
+        Pe[2] = (nt2 + self.__sig) / (self.count_m + self.__V*self.__sig)
+        Pe[3] = (nt3 + self.__sig) / (self.count_e + self.__V*self.__sig)
+        return Pe
 
     # Train the HDP part
     def trainHDP(self):
