@@ -11,6 +11,7 @@ sentence segmentation.
 import numpy as np
 import pickle
 import re
+from multiprocessing import Pool
 
 class Mod:
 
@@ -35,11 +36,21 @@ class Mod:
         # Define model data, including training dictionary and
         #   training results.
         
-        # Training dictionary
+        # Using dictionary
         self.Word = []
         self.Char = []
 
-        # HMM training results
+        # HMM training
+        self.count_s = 0
+        self.count_b = 0
+        self.count_m = 0
+        self.count_e = 0
+        
+        self.count_bm = 0
+        self.count_be = 0
+        self.count_mm = 0
+        self.count_me = 0
+
         self.Pt = np.zeros( (4,4) )     # {SBME}
         self.Pe = np.zeros( (len(self.Char),4) )
 
@@ -113,15 +124,28 @@ class Mod:
         self.trainHMM
         self.trainHDP
     
+
     # Train the HMM part
     def trainHMM(self):
-        
         # Tags
         '''
         { S B M E }
           0 1 2 3
         '''
+        # train HMM Pt
+        '''
+        must train HMM Pt first
+        the count data will be used for Pe
+        '''
+        self.trainHMMPt
 
+        # train HMM Pe
+        pool = Pool()
+        pool.map(self.trainHMMPe,range(len(self.Char)))
+
+    
+    # Train HMM Pt
+    def trainHMMPt(self):
         #-----------------------------------------------------
         # Train Transition Probability
         #-----------------------------------------------------
@@ -132,82 +156,75 @@ class Mod:
         the count of count_s
         same assumptions are also applied for other calculation
         '''
-        count_s = 0
-        count_b = 0
-        count_m = 0
-        count_e = 0
-        
-        count_bm = 0
-        count_be = 0
-        count_mm = 0
-        count_me = 0
-
         for w in self.Word:
             
             if len(w)==1:
-                count_s = count_s + 1
+                self.count_s = self.count_s + 1
             elif len(w)==2:
-                count_be = count_be + 1
+                self.count_be = self.count_be + 1
             elif len(w)>2:
-                count_bm = count_bm + 1
-                count_me = count_me + 1
-                count_mm = count_mm + (len(w)-3)
+                self.count_bm = self.count_bm + 1
+                self.count_me = self.count_me + 1
+                self.count_mm = self.count_mm + (len(w)-3)
         
-        count_b = count_bm + count_be
-        count_m = count_bm + count_mm
-        count_e = count_be + count_me
+        self.count_b = self.count_bm + self.count_be
+        self.count_m = self.count_bm + self.count_mm
+        self.count_e = self.count_be + self.count_me
         
         # S->S
-        self.Pt[0,0] = (count_s/2 + self.__the)/(count_s + self.__T*self.__the)
+        self.Pt[0,0] = (self.count_s/2 + self.__the)/(self.count_s + self.__T*self.__the)
         # S->B
-        self.Pt[0,1] = (count_s/2 + self.__the)/(count_s + self.__T*self.__the)
+        self.Pt[0,1] = (self.count_s/2 + self.__the)/(self.count_s + self.__T*self.__the)
         
         # B->M
-        self.Pt[1,2] = (count_bm + self.__the)/(count_bm + count_be + self.__T*self.__the)
+        self.Pt[1,2] = (self.count_bm + self.__the)/(self.count_bm + self.count_be + self.__T*self.__the)
         # B->E
-        self.Pt[1,3] = (count_be + self.__the)/(count_bm +count_be + self.__T*self.__the)
+        self.Pt[1,3] = (self.count_be + self.__the)/(self.count_bm + self.count_be + self.__T*self.__the)
 
         # M->M
-        self.Pt[2,2] = (count_mm + self.__the)/(count_mm +count_me + self.__T*self.__the)
+        self.Pt[2,2] = (self.count_mm + self.__the)/(self.count_mm + self.count_me + self.__T*self.__the)
         # M->E
-        self.Pt[2,3] = (count_me + self.__the)/(count_mm +count_me + self.__T*self.__the)
+        self.Pt[2,3] = (self.count_me + self.__the)/(self.count_mm + self.count_me + self.__T*self.__the)
 
         # E->S
-        self.Pt[3,0] = (count_e/2 + self.__the)/(count_e + self.__T*self.__the)
+        self.Pt[3,0] = (self.count_e/2 + self.__the)/(self.count_e + self.__T*self.__the)
         # E->B
-        self.Pt[3,1] = (count_e/2 + self.__the)/(count_e + self.__T*self.__the)
+        self.Pt[3,1] = (self.count_e/2 + self.__the)/(self.count_e + self.__T*self.__the)
 
+
+    # Train HMM Pe
+    def trainHMMPe(self,idx):
         #-----------------------------------------------------
         # Train Emission Probability
         #-----------------------------------------------------
         '''
         row number corresponding to self.Char
+        idx is the index of self.Char
         '''
-        ic = 0      # index for char
-        for c in self.Char:
-            nt0 = 0
-            nt1 = 0
-            nt2 = 0
-            nt3 = 0
-            for w in self.Word:
-                l = len(w)
-                for i in range(l):
-                    if c == w[i]:
-                        if l == 1:
-                            nt0 = nt0 + 1
-                        elif i == 0:
-                            nt1 = nt1 + 1
-                        elif i == l-1:
-                            nt3 = nt3 + 1
-                        else:
-                            nt2 = nt2 + 1
-            
-            self.Pe[ic,0] = (nt0 + self.__sig) / (count_s + self.__V*self.__sig)
-            self.Pe[ic,1] = (nt1 + self.__sig) / (count_b + self.__V*self.__sig)
-            self.Pe[ic,2] = (nt2 + self.__sig) / (count_m + self.__V*self.__sig)
-            self.Pe[ic,3] = (nt3 + self.__sig) / (count_e + self.__V*self.__sig)
-            ic = ic +1
-    
+        print(idx)
+        c = self.Char[idx]
+        nt0 = 0
+        nt1 = 0
+        nt2 = 0
+        nt3 = 0
+        for w in self.Word:
+            l = len(w)
+            for i in range(l):
+                if c == w[i]:
+                    if l == 1:
+                        nt0 = nt0 + 1
+                    elif i == 0:
+                        nt1 = nt1 + 1
+                    elif i == l-1:
+                        nt3 = nt3 + 1
+                    else:
+                        nt2 = nt2 + 1
+        
+        self.Pe[idx,0] = (nt0 + self.__sig) / (self.count_s + self.__V*self.__sig)
+        self.Pe[idx,1] = (nt1 + self.__sig) / (self.count_b + self.__V*self.__sig)
+        self.Pe[idx,2] = (nt2 + self.__sig) / (self.count_m + self.__V*self.__sig)
+        self.Pe[idx,3] = (nt3 + self.__sig) / (self.count_e + self.__V*self.__sig)
+
 
     # Train the HDP part
     def trainHDP(self):
@@ -215,15 +232,18 @@ class Mod:
         print("theta", self.__the)
         print("sigma", self.__sig)
 
+
     #-----------------------------------------------------
     # Segment Stage
     # Read sentence to be segmented
     def readSen(self):
         print("readSen fun not started...")
 
+
     # Segment sentence
     def segSen(self):
         print("segSen fun not started...")
+
 
     #-----------------------------------------------------
     # Additional Methods
@@ -236,6 +256,7 @@ class Mod:
         print('\t # of words: \t', len(self.Word))
         print('----------------------------------------')
 
+
     # Print characteristic info
     def infoChar(self):
         print('----------------------------------------')
@@ -243,6 +264,7 @@ class Mod:
         print('\t # of Chars: \t', len(self.Char))
         print('----------------------------------------')
     
+
     # Print training info
     def infoTrain(self):
         print('----------------------------------------')
@@ -252,9 +274,11 @@ class Mod:
         print("HMM-Pt:")
         print(self.Pt)
 
+
     # Print segmentation result
     def infoSeg(self):
         print("infoDic fun not started...")
+
 
     # Save/export current model and data.
     # If the model has been trained, simply save it for next time.
