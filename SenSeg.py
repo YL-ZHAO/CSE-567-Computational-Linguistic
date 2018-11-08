@@ -121,8 +121,8 @@ class Mod:
     # Train the model
     def trainMod(self):
 
-        self.trainHMM
-        self.trainHDP
+        self.trainHMM()
+        self.trainHDP()
     
 
     # Train the HMM part
@@ -137,13 +137,15 @@ class Mod:
         must train HMM Pt first
         the count data will be used for Pe
         '''
-        self.trainHMMPt
+        self.trainHMMPt()
 
         # train HMM Pe
         pool = Pool()
-        pool.map(self.trainHMMPe,range(len(self.Char)))
+        self = pool.map(self.trainHMMPe,range(10))  #len(self.Char)
+        # pool.close()
+        # pool.join()
 
-    
+
     # Train HMM Pt
     def trainHMMPt(self):
         #-----------------------------------------------------
